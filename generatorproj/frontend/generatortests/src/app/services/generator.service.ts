@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class GeneratorService {
-  private apiUrl = 'https://testgenie.onrender.com/'; // Update if backend is deployed
+  private apiUrl = 'https://testgenie.onrender.com'; // Update if backend is deployed
 
   constructor(private http: HttpClient) {}
 
