@@ -1,0 +1,233 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa; /* Light gray background */
+    color: #333; /* Dark gray text */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+.container {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Card Styling */
+.card {
+    background: #ffffff; /* White background */
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    padding: 20px;
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 15px;
+}
+.dropdown-menu {
+    position: absolute !important;
+    will-change: transform;
+    z-index: 1050 !important; /* Ensure it appears above other elements */
+}
+select.form-control {
+    line-height: normal !important;  /* Ensure text isn't cut */
+    padding: 0.5rem 0.75rem !important; /* Adjust padding */
+    height: auto !important; /* Allow dropdown to expand */
+}
+
+
+/* Labels */
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Inputs and Select */
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Primary Button */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Success Button */
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Info Button */
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+/* Button Hover Effects */
+button:hover {
+    opacity: 0.9;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center; /* Ensure text is centered */
+}
+
+/* Loading Dots */
+.typing-dots {
+    display: flex;
+    gap: 5px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: #007bff;
+    border-radius: 50%;
+    animation: blink 1.5s infinite;
+}
+
+/* Loading Animation */
+@keyframes blink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+
+/* Toggle Switch Container */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+}
+
+/* Hide Default Checkbox */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Slider (Switch Button) */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc; /* Default off state */
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+/* Circular Handle */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 3.5px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+/* When Checked (Turned ON) */
+input:checked + .slider {
+    background-color: #007bff; /* Blue when ON */
+}
+
+/* Move Handle to Right when ON */
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Tooltip on Hover */
+.toggle-switch::after {
+    content: "Not happy with the suggestion? Create your own!";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Show Tooltip on Hover */
+.toggle-switch:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+/* Align toggle switch to the right */
+.toggle-container {
+    display: flex;
+    justify-content: flex-end; /* Push toggle to the right */
+    margin-bottom: 10px; /* Add some spacing */
+}
+
+.loading-text .hourglass {
+    display: inline-block;
+    animation: rotate-hourglass 1.5s infinite linear;
+}
+
+/* Hourglass Rotation Animation */
+@keyframes rotate-hourglass {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+.header-text {
+    font-family: 'Spectral', serif;
+    font-weight: 700;
+    text-align: center;
+}
+
+.button-text {
+    font-family: 'Spectral', serif;
+    font-weight: 500;
+    text-transform: uppercase;
+}

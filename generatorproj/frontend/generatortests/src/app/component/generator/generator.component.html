@@ -1,0 +1,98 @@
+<div class="container mt-5" [class.loading-active]="isLoading">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center text-primary mb-4" class="header-text">Test Genie 👻</h2>
+        <!-- Relationship Type Selection -->
+        <div class="form-group">
+            <label for="relationship" class="font-weight-bold">Select Relationship Type:</label>
+            <select id="relationship" class="form-control" [(ngModel)]="relationshipType">
+                <option value="OneToOne">One-To-One</option>
+                <option value="OneToMany">One-To-Many</option>
+            </select>
+        </div>
+
+        <!-- Model Count Selection -->
+        <div class="form-group">
+            <label for="modelCount" class="font-weight-bold">Number of Models:</label>
+            <input id="modelCount" type="number" class="form-control" [(ngModel)]="modelCount" min="2" readonly />
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn btn-primary btn-block mt-3" (click)="generateSuggestions()" [disabled]="isLoading">
+            Generate Suggestions
+        </button>
+
+        <!-- Display Suggestions -->
+        <div *ngIf="suggestions?.suggestions?.length > 0" class="mt-4">
+            <h3 class="text-success text-center">Generated Suggestions</h3>
+            <div class="toggle-container">
+            <!-- Toggle Button -->
+            <div class="text-center mb-3">
+                <label class="toggle-switch">
+                    <input type="checkbox" [checked]="useManualInput" (change)="toggleManualInput()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            </div>
+        
+            <!-- Select Model OR Enter Model -->
+            <div class="form-group">
+                <label class="font-weight-bold">
+                    Model
+                    <span *ngIf="useManualInput">(Format: Entity1 - Entity2)</span>
+                </label>
+                <select *ngIf="!useManualInput" class="form-control" [(ngModel)]="selectedModel">
+                    <option *ngFor="let suggestion of suggestions?.suggestions" [value]="suggestion.model">
+                        {{ suggestion.model }}
+                    </option>
+                </select>
+                <input *ngIf="useManualInput" type="text" class="form-control" [(ngModel)]="selectedModel"
+                    placeholder="Enter model name" />
+            </div>
+
+            <!-- Select Exception OR Enter Exception -->
+            <div *ngIf="selectedModel" class="form-group">
+                <label class="font-weight-bold">
+                    Exception
+                    <span *ngIf="useManualInput">(Format: ExceptionName - Description)</span>
+                </label>
+                <select *ngIf="!useManualInput" class="form-control" [(ngModel)]="selectedException">
+                    <option *ngFor="let exception of getSelectedModel()?.exceptions" [value]="exception">
+                        {{ exception }}
+                    </option>
+                </select>
+                <input *ngIf="useManualInput" type="text" class="form-control" [(ngModel)]="selectedException"
+                    placeholder="Enter exception name" />
+            </div>
+
+            <!-- Select JPQL Query OR Enter JPQL Query -->
+            <div *ngIf="selectedModel" class="form-group">
+                <label class="font-weight-bold">
+                    JPQL Query
+                    <span *ngIf="useManualInput">(Format: Query Description)</span>
+                </label>
+                <select *ngIf="!useManualInput" class="form-control" [(ngModel)]="selectedQuery">
+                    <option *ngFor="let query of getSelectedModel()?.jpqlQueries" [value]="query">
+                        {{ query }}
+                    </option>
+                </select>
+                <input *ngIf="useManualInput" type="text" class="form-control" [(ngModel)]="selectedQuery"
+                    placeholder="Enter query description" />
+            </div>
+
+            <!-- Modify Test File Button -->
+            <button class="btn btn-success btn-block mt-3" (click)="modifyTestFile()"
+                [disabled]="isLoading || !selectedModel || !selectedException || !selectedQuery">
+                Modify & Download Test File
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Blurred Background Loading -->
+<div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-content">
+        <p class="loading-text">
+            Processing your request ... <span class="hourglass">⏳</span> 
+        </p>        
+    </div>
+</div>
