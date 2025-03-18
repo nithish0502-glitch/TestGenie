@@ -154,6 +154,7 @@ You are an AI that generates **strictly formatted** and **complete** entity mode
 - Each pair should be a **real-world example** and **follow Java naming conventions**.
 - **If One-to-One:** The first entity uniquely relates to one instance of the second entity.
 - **If One-to-Many:** The first entity relates to multiple instances of the second entity.
+- **Each entity must have at least 5 attributes with meaningful names and types relevant to its domain.**
 - **Format:** "Entity1 - Entity2"
 ${regenerate ? `- Ensure these are different from previous: ${lastGeneratedModels.join(", ")}` : ""}
 
