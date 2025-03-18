@@ -292,7 +292,7 @@ Query 3: Query Description
 
 
 async function sendToAI(messages) {
-  console.log(messages);
+  console.log("Requested");
   try {
     const response = await axiosInstance.post(
       "https://api.mistral.ai/v1/chat/completions",
@@ -309,7 +309,7 @@ async function sendToAI(messages) {
           Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`,
           "Content-Type": "application/json",
         },
-        timeout: 45000, // ⏳ Set a **15-second** timeout
+        timeout: 60000, // ⏳ Set a timeout
       }
     );
 
