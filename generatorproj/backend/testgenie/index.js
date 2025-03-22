@@ -396,14 +396,16 @@ app.post("/modify-test-file", async (req, res) => {
       {
         role: "system",
         content: `You are an AI that modifies a Spring Boot test file. Follow these rules:
-        1️⃣ **DO NOT change the class name, structure, or test framework imports**.
-        2️⃣ Replace existing test logic with **new logic relevant to the model**: ${entity1} and ${entity2}.
-        3️⃣ Implement test logic for the following **custom exception**: ${selectedException}.
-        4️⃣ Implement a test case to validate the following **JPQL query**: "${selectedQuery}".
-        5 DO NOT remove or reduce the number of test cases. Ensure the modified file has the same 
-        6 Ensure all test cases maintain proper structure and Spring Boot testing best practices.
-        7 Return ONLY the modified Java test file.
-        8 ** Strictly Follow the exact API format as in the sample test file.** 
+1️⃣ **DO NOT change the class name, structure, or test framework imports**.
+2️⃣ Replace existing test logic with **new logic relevant to the model**: ${entity1} and ${entity2}.
+3️⃣ Implement test logic for the following **custom exception**: ${selectedException}, ensuring that the related attributes exist in the entity.
+4️⃣ Implement a test case to validate the following **JPQL query**: "${selectedQuery}".
+5️⃣ **DO NOT add test cases for attributes or functionalities that do not exist in the model**.
+6️⃣ **Ensure that all test cases align with the entity structure, including attributes, relationships, and validations**.
+7️⃣ **DO NOT remove or reduce the number of test cases. The modified file must retain the same number of tests.**
+8️⃣ **Maintain proper structure and follow Spring Boot testing best practices**.
+9️⃣ Return **ONLY** the modified Java test file.
+🔟 **Strictly follow the exact API format as in the sample test file.**
         `,
       },
       {
