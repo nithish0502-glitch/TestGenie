@@ -41,6 +41,7 @@
                     <span *ngIf="useManualInput">(Format: Entity1 - Entity2)</span>
                 </label>
                 <select *ngIf="!useManualInput" class="form-control" [(ngModel)]="selectedModel">
+                    <option value="" disabled selected>Select a model</option>
                     <option *ngFor="let suggestion of suggestions?.suggestions" [value]="suggestion.model">
                         {{ suggestion.model }}
                     </option>
@@ -56,6 +57,7 @@
                     <span *ngIf="useManualInput">(Format: ExceptionName - Description)</span>
                 </label>
                 <select *ngIf="!useManualInput" class="form-control" [(ngModel)]="selectedException">
+                    <option value="" disabled selected>Select an exception</option>
                     <option *ngFor="let exception of getSelectedModel()?.exceptions" [value]="exception">
                         {{ exception }}
                     </option>
@@ -71,6 +73,7 @@
                     <span *ngIf="useManualInput">(Format: Query Description)</span>
                 </label>
                 <select *ngIf="!useManualInput" class="form-control" [(ngModel)]="selectedQuery">
+                    <option value="" disabled selected>Select a JPQL query</option>
                     <option *ngFor="let query of getSelectedModel()?.jpqlQueries" [value]="query">
                         {{ query }}
                     </option>
