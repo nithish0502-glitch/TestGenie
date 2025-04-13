@@ -15,121 +15,6 @@ app.use(express.json());
 
 let lastGeneratedModels = [];
 
-// app.post("/generate-suggestion", async (req, res) => {
-//   try {
-//     const { relationshipType, modelCount, regenerate } = req.body;
-
-//     if (!relationshipType || !modelCount || modelCount < 2) {
-//       return res.status(400).json({ error: "Invalid input. Provide relationshipType and at least 2 models." });
-//     }
-
-//     // Single AI request for entity models, exceptions, and JPQL queries
-//     const prompt = `
-//   You are an AI that generates **unique entity models**, **realistic custom exceptions**, and **JPQL queries** for a Spring Boot project.
-
-//   ### 1️⃣ **Generate 10 unique entity pairs** related by **${relationshipType}**.
-//      - Each pair should be **real-world use cases** and **follow Java naming conventions**.
-//      - **If One-to-One:** The first entity should uniquely relate to only one instance of the second entity.
-//      - **If One-to-Many:** The first entity should relate to multiple instances of the second entity.
-//      - Format: "Entity1 - Entity2".
-//      ${regenerate ? `- Ensure these new pairs are different from previous: ${lastGeneratedModels.join(", ")}` : ""}
-
-//   ### 2️⃣ **For each entity pair, generate 3 meaningful custom exceptions based on the relationship type.**
-//      - **One-to-One Relationship:**  
-//        - Handle **logical constraints** preventing multiple assignments.
-//        - Ensure **entities meet required conditions** before assignment.
-//        - Examples:
-//          - **Student - Classroom**  
-//            - \`StudentAlreadyEnrolledException\` - "Students can only be enrolled in one classroom per term to avoid scheduling conflicts."
-//            - \`ClassroomOverCapacityException\` - "Classrooms have a fixed capacity for safety and quality of education."
-//          - **Driver - Vehicle**  
-//            - \`DriverAlreadyAssignedException\` - "Drivers can only operate one vehicle at a time for safety and legal reasons."
-//            - \`VehicleUnderMaintenanceException\` - "Vehicles must be in working condition before being assigned to drivers."
-//      - **One-to-Many Relationship:**  
-//        - Ensure **data integrity** when handling multiple relationships.
-//        - Consider **business rules for managing multiple assignments**.
-//        - Examples:
-//          - **Library - Books**  
-//            - \`LibraryBookLimitExceededException\` - "Libraries have a finite amount of physical space for storing books."
-//            - \`BookAlreadyRegisteredInLibraryException\` - "Each book should have a unique registration in a library to avoid duplication."
-//          - **Hospital - Patients**  
-//            - \`PatientUnderQuarantineException\` - "Patients under quarantine must remain isolated to prevent the spread of infectious diseases."
-//            - \`PatientTransferInProgressException\` - "Patients in the process of being transferred cannot be admitted, discharged, or assigned to new treatments."
-//      - **Format:** "**ExceptionName - Meaningful Description**"
-
-//      ### 3️⃣ **For each first entity in the pair, generate 3 complex JPQL query descriptions.**
-//      - Each query should involve **filtering, aggregation, or joining** with the second entity.
-//      - Ensure **each query is different**, covering various real-world use cases Note: Dont use date formation.
-//      - Examples:
-//        - **For Student - Classroom:**
-//          - "Retrieve all students younger than 18 years old."
-//          - "List classrooms that have more than 30 students enrolled."
-//          - "Find students whose names start with a specified prefix."
-//        - **For Library - Books:**
-//          - "Find all libraries located in a specified region."
-//          - "Find libraries with fewer than 100 available books."
-//          - "List books available in a given location."
-//      - **Format:**  
-//        - Query 1: <Query Description>  
-//        - Query 2: <Query Description>  
-//        - Query 3: <Query Description>  
-  
-//   **Response format:**
-//   ### Response format (STRICTLY FOLLOW THIS):
-//   Entity1 - Entity2  
-//   - **Exception1** - Description  
-//   - **Exception2** - Description  
-//   - **Exception3** - Description  
-//   **JPQL Queries:**  
-//   Query 1: Query Description  
-//   Query 2: Query Description  
-//   Query 3: Query Description  
-  
-// `;
-
-//     const aiResponse = await sendToAI([{ role: "system", content: prompt }]);
-//     if (!aiResponse) return res.status(500).json({ error: "AI generation failed" });
-
-//     // Processing AI Response
-//     const lines = aiResponse.split("\n").map((line) => line.trim()).filter((line) => line);
-//     const maxSuggestions = 10; // Limit to 10 suggestions
-// const suggestions = [];
-// let currentPair = null;
-// let exceptions = [];
-// let jpqlQueries = [];
-
-
-// for (const line of lines) {
-//   if (suggestions.length >= maxSuggestions) break; // Stop processing after 10
-
-//   if (line.includes(" - ") && !line.startsWith("-")) {
-//     if (currentPair) {
-//       suggestions.push({ model: currentPair, exceptions, jpqlQueries });
-//     }
-//     currentPair = line;
-//     exceptions = [];
-//     jpqlQueries =[];
-//   } else if (line.startsWith("-")) {
-//     exceptions.push(line.replace("- ", ""));
-//   } else if (line.startsWith("Query")) {
-//     jpqlQueries.push(line.replace(/^Query \d+: /, "").trim()); // Capture multiple JPQL queries
-// }
-// }
-
-// if (currentPair && suggestions.length < maxSuggestions) {
-//   suggestions.push({ model: currentPair, exceptions, jpqlQueries });
-// }
-
-//     lastGeneratedModels = suggestions.map((s) => s.model);
-
-//     res.json({
-//       message: "✅ Suggestions generated successfully!",
-//       suggestions,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: "Suggestion generation failed: " + error.message });
-//   }
-// });
 
 app.post("/generate-suggestion", async (req, res) => {
   try {
@@ -195,102 +80,79 @@ Note: Dont use date formation.
           - "Find libraries with fewer than 100 available books."
           - "List books available in a given location."
 - **Do NOT generate less or more than 3 queries.**
-- **Format:**  
-  - <Query Description>  
-  - <Query Description>  
-  - <Query Description>  
-
----
-
-### **STRICT RESPONSE FORMAT:**
+📌 FORMAT:
+Respond with JSON like this:
+\`\`\`json
+[
+  {
+    "model": "Entity1 - Entity2",
+    "exceptions": [
+      "ExceptionOne - Short description (6–7 words)",
+      "ExceptionTwo" - Short description (6–7 words)",
+      "ExceptionThree" - Short description (6–7 words)"
+    ],
+    "jpqlQueries": [
+      "Query 1 Description",
+      "Query 2 Description",
+      "Query 3 Description"
+    ]
+  },
+  ...
+]
 \`\`\`
-Entity1 - Entity2  
-- **Exception1** - Description  
-- **Exception2** - Description  
-- **Exception3** - Description  
-**JPQL Queries:**  
-Query 1: Query Description  
-Query 2: Query Description  
-Query 3: Query Description  
-\`\`\`
-🔴 **NO missing fields! If AI fails to provide any required field, regenerate with complete data.**
+
+✅ STRICT RULES:
+- **- Do not return more or less than 10 items — only exactly 10.
+- **Each 'exceptions' array must have exactly 3 items.**
+- **Each 'jpqlQueries' array must have exactly 3 items.**
+- No surrounding explanation, markdown headers, or commentary — just pure JSON inside triple backticks.
+
+⚠️ Invalid outputs will be rejected automatically.
 `;
-
 
     const aiResponse = await sendToAI([{ role: "system", content: prompt }]);
     if (!aiResponse) return res.status(500).json({ error: "AI generation failed" });
 
     // Processing AI Response
-    const lines = aiResponse.split("\n").map((line) => line.trim()).filter((line) => line);
-    const maxSuggestions = 10;
-    const suggestions = [];
-    let currentPair = null;
-    let exceptions = [];
-    let jpqlQueries = [];
-
-    for (const line of lines) {
-      if (suggestions.length >= maxSuggestions) break;
-
-      if (line.includes(" - ") && !line.startsWith("-") && !line.startsWith("Query")) {
-        // If we encounter a new entity pair, save the previous one first
-        if (currentPair) {
-          if (exceptions.length === 0 || jpqlQueries.length === 0) {
-            throw new Error(`Missing data for ${currentPair}. Exceptions or JPQL queries are empty.`);
-          }
-          suggestions.push({ model: currentPair, exceptions, jpqlQueries });
-        }
-        currentPair = line;
-        exceptions = [];
-        jpqlQueries = [];
-      } else if (line.startsWith("- **")) {
-        // Extract exceptions correctly, handling markdown
-        const match = line.match(/-\s\*\*(.*?)\*\*\s-\s(.*)/);
-        if (match) {
-          exceptions.push(`${match[1]} - ${match[2]}`);
-        }
-      } else if (line.startsWith("Query")) {
-        // Extract JPQL Queries
-        const queryMatch = line.match(/^Query \d+:\s(.*)/);
-        if (queryMatch) {
-          jpqlQueries.push(queryMatch[1]);
-        }
-      }
+    const match = aiResponse.match(/```json([\s\S]*?)```/);
+    if (!match || !match[1]) {
+      return res.status(500).json({ error: "Invalid AI response format. JSON block not found." });
     }
 
-    // Push the last entity pair if it exists
-    if (currentPair) {
-      if (exceptions.length === 0 || jpqlQueries.length === 0) {
-        throw new Error(`Missing data for ${currentPair}. Exceptions or JPQL queries are empty.`);
-      }
-      if (suggestions.length < maxSuggestions) {
-        suggestions.push({ model: currentPair, exceptions, jpqlQueries });
-      }
+    let suggestions;
+    try {
+      suggestions = JSON.parse(match[1]);
+    } catch (parseError) {
+      return res.status(500).json({ error: "Failed to parse JSON from AI response." });
     }
 
-    // **Final Validation for Empty Arrays**
-    for (const suggestion of suggestions) {
-      if (!suggestion.model) {
-        throw new Error(`Invalid suggestion format: Model is missing.`);
-      }
-      if (suggestion.exceptions.length === 0) {
-        throw new Error(`Invalid suggestion format: Exceptions array is empty for model ${suggestion.model}.`);
-      }
-      if (suggestion.jpqlQueries.length === 0) {
-        throw new Error(`Invalid suggestion format: JPQL Queries array is empty for model ${suggestion.model}.`);
+    // Validation for strict format
+    if (!Array.isArray(suggestions) || suggestions.length !== 10) {
+      return res.status(500).json({ error: "AI response must include exactly 10 entity models." });
+    }
+
+    for (const s of suggestions) {
+      if (
+        !s.model ||
+        !Array.isArray(s.exceptions) ||
+        s.exceptions.length !== 3 ||
+        !Array.isArray(s.jpqlQueries) ||
+        s.jpqlQueries.length !== 3
+      ) {
+        return res.status(500).json({ error: `Invalid structure in model: ${s.model}` });
       }
     }
 
     lastGeneratedModels = suggestions.map((s) => s.model);
 
-    res.json({
+    return res.json({
       message: "✅ Suggestions generated successfully!",
       suggestions,
     });
   } catch (error) {
-    res.status(500).json({ error: "Suggestion generation failed: " + error.message });
+    return res.status(500).json({ error: "Suggestion generation failed: " + error.message });
   }
 });
-
 
 async function sendToAI(messages) {
   console.log("Requested");
