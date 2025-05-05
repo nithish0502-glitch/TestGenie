@@ -8,7 +8,7 @@ import com.examly.springapp.model.Product;
 public interface ProductInMemoryService {
     Product createProduct(Product product) throws LowStockException;
 
-    Product getProductById(int productId);
+    Product getProductById(int productId) throws LowStockException;
 
     List<Product> updateProductByCategory(String category, double newPrice, int newStockQuantity) throws LowStockException;
 
@@ -16,3 +16,4 @@ public interface ProductInMemoryService {
 
     List<Product> viewProductDetailsByCategory(String category);
 }
+ 
