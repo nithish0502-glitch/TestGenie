@@ -140,128 +140,189 @@ public class SpringappApplicationTests {
         Exception exception = assertThrows(Exception.class, () -> {
             constructor.newInstance(2, "2024-04-01", "Jane Doe", "Math", 5.0); // stock below 10
         });
-        
+
         assertTrue(exceptionClass.isInstance(exception.getCause()));
         assertTrue(exception.getCause().getMessage().contains("Stock is low"));
     }
     
 
+     private static Object serviceInstance;
+    private static Class<?> productClass;
+    private static Constructor<?> constructor;
+    private static Connection connection;
+    private static Object productDAO;
+
+    @BeforeAll
+    public static void setUp() throws Exception {
+        Class<?> serviceClass = Class.forName("com.examly.springapp.service.impl.ProductInMemoryServiceImpl");
+        serviceInstance = serviceClass.getDeclaredConstructor().newInstance();
+
+        productClass = Class.forName("com.examly.springapp.model.Product");
+        constructor = productClass.getConstructor(int.class, String.class, String.class, double.class, int.class, boolean.class);
+
+        Class<?> daoClass = Class.forName("com.examly.springapp.dao.impl.ProductInMemoryDAOImpl");
+        productDAO = daoClass.getDeclaredConstructor().newInstance();
+
+        Class<?> jdbcUtilsClass = Class.forName("com.examly.springapp.config.JdbcUtils");
+        connection = (Connection) jdbcUtilsClass.getMethod("getConnection").invoke(null);
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException {
+        clearDatabase();
+        System.out.println("Database cleared after all tests.");
+    }
+
+    private static void clearDatabase() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM product");
+        }
+    }
+
+    @Test
+    public void Week1_Day1_AllRequiredFoldersExist() {
+        String[] requiredFolders = {
+                "src/main/java/com/examly/springapp/dao",
+                "src/main/java/com/examly/springapp/config",
+                "src/main/java/com/examly/springapp/model",
+                "src/main/java/com/examly/springapp/service",
+                "src/main/java/com/examly/springapp/exception"
+        };
+
+        for (String folderPath : requiredFolders) {
+            File directory = new File(folderPath);
+            assertTrue(directory.exists() && directory.isDirectory(),
+                    "Folder should exist: " + folderPath);
+        }
+    }
+
+    @Test
+    public void Week1_Day1_AllRequiredClassesExist() {
+        String[] requiredClasses = {
+                "com.examly.springapp.model.Product",
+                "com.examly.springapp.service.ProductInMemoryService",
+                "com.examly.springapp.dao.impl.ProductInMemoryDAOImpl"
+        };
+
+        for (String className : requiredClasses) {
+            try {
+                Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                fail("Class should exist: " + className);
+            }
+        }
+    }
+
+    @Test
+    public void Week1_Day1_testValidProductCreation() throws Exception {
+        Object product = constructor.newInstance(1, "Laptop", "Electronics", 1200.0, 20, true);
+
+        Method toStringMethod = productClass.getMethod("toString");
+        String productDetails = (String) toStringMethod.invoke(product);
+
+        assertTrue(productDetails.contains("Laptop"));
+        assertTrue(productDetails.contains("Electronics"));
+        assertTrue(productDetails.contains("1200.0"));
+        assertTrue(productDetails.contains("true"));
+    }
+
+    @Test
+    public void Week1_Day1_testLowStockThrowsException() throws Exception {
+        Class<?> exceptionClass = Class.forName("com.examly.springapp.exception.LowStockException");
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            constructor.newInstance(2, "Mouse", "Accessories", 25.0, 5, true);
+        });
+
+        assertTrue(exceptionClass.isInstance(exception.getCause()));
+        assertTrue(exception.getCause().getMessage().contains("Stock is low"));
+    }
+
     @Test
     @Order(1)
-    public void Week1_Day2_testMarkAttendance_InMemoryList() throws Exception {
-        Object att1 = constructor.newInstance(1, "2024-04-29", "Alice", "Math", 85.0);
-        Object att2 = constructor.newInstance(2, "2024-04-29", "Bob", "Physics", 75.0);
-        Object att3 = constructor.newInstance(3, "2024-04-29", "Charlie", "Chemistry", 60.0);
-        Object att4 = constructor.newInstance(4, "2024-04-29", "Diana", "Math", 95.0);
+    public void Week1_Day2_testAddProduct_InMemoryList() throws Exception {
+        Object p1 = constructor.newInstance(1, "Monitor", "Electronics", 200.0, 15, true);
+        Object p2 = constructor.newInstance(2, "Keyboard", "Accessories", 50.0, 12, true);
+        Object p3 = constructor.newInstance(3, "Tablet", "Electronics", 300.0, 20, false);
+        Object p4 = constructor.newInstance(4, "Mouse", "Accessories", 25.0, 14, true);
 
-        Method markMethod = serviceInstance.getClass().getMethod("markAttendance", attendanceClass);
-        markMethod.invoke(serviceInstance, att1);
-        markMethod.invoke(serviceInstance, att2);
-        markMethod.invoke(serviceInstance, att3);
-        markMethod.invoke(serviceInstance, att4);
+        Method createMethod = serviceInstance.getClass().getMethod("addProduct", productClass);
+        createMethod.invoke(serviceInstance, p1);
+        createMethod.invoke(serviceInstance, p2);
+        createMethod.invoke(serviceInstance, p3);
+        createMethod.invoke(serviceInstance, p4);
 
-        // Access internal DAO and list
-        Field daoField = serviceInstance.getClass().getDeclaredField("attendanceDAO");
+        Field daoField = serviceInstance.getClass().getDeclaredField("productDAO");
         daoField.setAccessible(true);
         Object daoInstance = daoField.get(serviceInstance);
 
-        Field internalListField = daoInstance.getClass().getDeclaredField("attendanceDatabase");
-        internalListField.setAccessible(true);
-        List<?> attendanceList = (List<?>) internalListField.get(daoInstance);
+        Field listField = daoInstance.getClass().getDeclaredField("productDatabase");
+        listField.setAccessible(true);
+        List<?> products = (List<?>) listField.get(daoInstance);
 
-        assertEquals(4, attendanceList.size(), "All attendance records should be added to the list");
+        assertEquals(4, products.size());
     }
 
     @Test
     @Order(2)
-    public void Week1_Day2_testGetAttendanceByStudentId_InMemoryList() throws Exception {
-        Method getById = serviceInstance.getClass().getMethod("getAttendanceByStudentId", int.class);
-        List<?> result = (List<?>) getById.invoke(serviceInstance, 1);
+    public void Week1_Day2_testGetProductById_InMemoryList() throws Exception {
+        Method getById = serviceInstance.getClass().getMethod("getProductById", int.class);
+        Object product = getById.invoke(serviceInstance, 1);
 
-        Method toStringMethod = attendanceClass.getMethod("toString");
-        String resultStr = (String) toStringMethod.invoke(result.get(0));
+        Method toStringMethod = productClass.getMethod("toString");
+        String resultStr = (String) toStringMethod.invoke(product);
 
-        assertTrue(resultStr.contains("Alice"));
-        assertTrue(resultStr.contains("Math"));
-        assertTrue(resultStr.contains("85.0"));
+        assertTrue(resultStr.contains("Monitor"));
     }
 
     @Test
     @Order(3)
-    public void Week1_Day2_testUpdateAttendance_InMemoryList() throws Exception {
-        Method updateMethod = serviceInstance.getClass().getMethod("updateAttendanceByNameAndCourse", String.class,
-                String.class, int.class);
-        updateMethod.invoke(serviceInstance, "Alice", "Math", 92);
+    public void Week1_Day2_testUpdateProductByCategory_InMemoryList() throws Exception {
+        Method updateMethod = serviceInstance.getClass().getMethod("updateProductByCategory", String.class, double.class, int.class);
+        updateMethod.invoke(serviceInstance, "Electronics", 250.0, 18);
 
-        Method getById = serviceInstance.getClass().getMethod("getAttendanceByStudentId", int.class);
-        List<?> result = (List<?>) getById.invoke(serviceInstance, 1);
+        Method getById = serviceInstance.getClass().getMethod("getProductById", int.class);
+        Object product = getById.invoke(serviceInstance, 1);
 
-        Method toStringMethod = attendanceClass.getMethod("toString");
-        String resultStr = (String) toStringMethod.invoke(result.get(0));
+        Method toStringMethod = productClass.getMethod("toString");
+        String resultStr = (String) toStringMethod.invoke(product);
 
-        assertTrue(resultStr.contains("92.0"));
+        assertTrue(resultStr.contains("250.0"));
     }
 
     @Test
     @Order(4)
-    public void Week1_Day2_testDeleteAttendanceByCourseAndPercent_InMemoryList() throws Exception {
-        Method deleteMethod = serviceInstance.getClass().getMethod("deleteStudentByAttendanceAndCourse", String.class,
-                int.class);
-        deleteMethod.invoke(serviceInstance, "Physics", 80); // Bob = 75 → should be deleted
+    public void Week1_Day2_testDeleteByPrice_InMemoryList() throws Exception {
+        Method deleteMethod = serviceInstance.getClass().getMethod("deleteProductByPrice", double.class);
+        deleteMethod.invoke(serviceInstance, 30.0);
 
-        Field daoField = serviceInstance.getClass().getDeclaredField("attendanceDAO");
+        Field daoField = serviceInstance.getClass().getDeclaredField("productDAO");
         daoField.setAccessible(true);
         Object daoInstance = daoField.get(serviceInstance);
 
-        Field internalListField = daoInstance.getClass().getDeclaredField("attendanceDatabase");
-        internalListField.setAccessible(true);
-        List<?> attendanceList = (List<?>) internalListField.get(daoInstance);
+        Field listField = daoInstance.getClass().getDeclaredField("productDatabase");
+        listField.setAccessible(true);
+        List<?> products = (List<?>) listField.get(daoInstance);
 
-        Method toStringMethod = attendanceClass.getMethod("toString");
+        Method toStringMethod = productClass.getMethod("toString");
 
-        assertEquals(3, attendanceList.size(), "Bob should be deleted");
-
-        for (Object att : attendanceList) {
-            String info = (String) toStringMethod.invoke(att);
-            assertFalse(info.contains("Bob"), "Bob should have been removed");
+        for (Object product : products) {
+            String info = (String) toStringMethod.invoke(product);
+            assertFalse(info.contains("Mouse"));
         }
     }
 
     @Test
     @Order(5)
-    public void Week1_Day2_testGetAllByRange_InMemoryList() throws Exception {
-        Method rangeMethod = serviceInstance.getClass().getMethod("getStudentByAttendanceByRange", int.class,
-                int.class);
-        List<?> result = (List<?>) rangeMethod.invoke(serviceInstance, 80, 100);
+    public void Week1_Day2_testViewByCategorySorted_InMemoryList() throws Exception {
+        Method viewMethod = serviceInstance.getClass().getMethod("viewProductDetailsByCategory", String.class);
+        List<?> result = (List<?>) viewMethod.invoke(serviceInstance, "Accessories");
 
-        assertEquals(2, result.size(), "Alice and Diana should be in the 80–100 range");
-
-        Method toStringMethod = attendanceClass.getMethod("toString");
-
-        for (Object att : result) {
-            String info = (String) toStringMethod.invoke(att);
-            assertTrue(info.contains("Alice") || info.contains("Diana"));
-        }
-    }
-
-    @Test
-    @Order(6)
-    public void Week1_Day2_testGetByAttendanceAndCourse_InMemoryList() throws Exception {
-        Method byCourseAndPercentMethod = serviceInstance.getClass().getMethod(
-                "getStudentByAttendanceAndCourse", String.class, int.class);
-
-        List<?> result = (List<?>) byCourseAndPercentMethod.invoke(serviceInstance, "Math", 95);
-
-        assertEquals(1, result.size(), "Only Diana has 95% in Math");
-
-        Method toStringMethod = attendanceClass.getMethod("toString");
+        assertEquals(1, result.size());
+        Method toStringMethod = productClass.getMethod("toString");
         String info = (String) toStringMethod.invoke(result.get(0));
-
-        assertTrue(info.contains("Diana"));
-        assertTrue(info.contains("Math"));
-        assertTrue(info.contains("95.0"));
+        assertTrue(info.contains("Keyboard"));
     }
-
     private int getRowCount() throws SQLException {
         try (PreparedStatement pstmt = connection.prepareStatement("SELECT COUNT(*) FROM attendance");
                 ResultSet rs = pstmt.executeQuery()) {
