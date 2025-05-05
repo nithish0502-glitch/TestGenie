@@ -10,5 +10,5 @@ public interface ProductInMemoryDAO {
     Product getProductById(int id) throws LowStockException;
     List<Product> updateProductByCategory(String category, double newPrice, int newStockQuantity) throws LowStockException;
     List<Product> deleteProductByPrice(double priceThreshold);
-    List<Product> viewProductDetailsByCategory(String category);
+    List<Product> viewProductDetailsByCategory(String category) ;
 }

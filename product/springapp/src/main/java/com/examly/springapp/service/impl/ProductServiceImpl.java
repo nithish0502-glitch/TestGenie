@@ -3,42 +3,38 @@ package com.examly.springapp.service.impl;
 import java.util.List;
 
 import com.examly.springapp.dao.ProductDAO;
-import com.examly.springapp.model.Product;
 import com.examly.springapp.dao.impl.ProductDAOImpl;
+import com.examly.springapp.exception.LowStockException;
+import com.examly.springapp.model.Product;
 import com.examly.springapp.service.ProductService;
 
 public class ProductServiceImpl implements ProductService {
 
-    private ProductDAO attendanceDAO = new ProductDAOImpl();
+    private ProductDAO productDAO = new ProductDAOImpl();
 
     @Override
-    public void deleteStudentByAttendanceAndCourse(String course, int attendancePercentage) {
-        attendanceDAO.deleteStudentByAttendanceAndCourse(course, attendancePercentage);
-        
+    public void createProduct(Product product) throws LowStockException {
+        productDAO.createProduct(product);
     }
 
     @Override
-    public List<Product> getStudentByAttendanceByRange(int minPercent, int maxPercent) {
-        return attendanceDAO.getStudentByAttendanceByRange(minPercent, maxPercent);
+    public Product getProductById(int productId) throws LowStockException {
+        return productDAO.getProductById(productId);
     }
 
     @Override
-    public List<Product> getAttendanceByStudentId(int studentId) { 
-        return attendanceDAO.getAttendanceByStudentId(studentId);
+    public List<Product> updateProductByCategory(String category, double newPrice, int newStockQuantity) throws LowStockException {
+        return productDAO.updateProductByCategory(category, newPrice, newStockQuantity);
     }
 
     @Override
-    public void markAttendance(Product attendance) throws LowAttendanceException {
-        if(attendance.getAttendancePercentage() < 40) throw new LowAttendanceException("Low Attendance");
-        attendanceDAO.markAttendance(attendance);
-        
+    public List<Product> deleteProductByPrice(double priceThreshold) throws LowStockException {
+        return productDAO.deleteProductByPrice(priceThreshold);
     }
 
     @Override
-    public void updateAttendanceByNameAndCourse(String name, String course, int newAttendancePercent) throws LowAttendanceException {
-        attendanceDAO.updateAttendanceByNameAndCourse(name, course, newAttendancePercent);
-        
+    public List<Product> viewProductDetailsByCategory(String category) throws LowStockException {
+        return productDAO.viewProductDetailsByCategory(category);
     }
-    
 }
  
