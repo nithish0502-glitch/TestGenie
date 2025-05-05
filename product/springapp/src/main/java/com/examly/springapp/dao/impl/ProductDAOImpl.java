@@ -16,7 +16,7 @@ public class ProductDAOImpl implements ProductDAO {
         }
  
         try (Connection con = JdbcUtils.getConnection()) {
-            String query = "INSERT INTO product(productId, name, category, price, stock, verified) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO products(productId, name, category, price, stock, verified) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement ptmt = con.prepareStatement(query);
             ptmt.setInt(1, product.getProductId());
             ptmt.setString(2, product.getName());
@@ -33,7 +33,7 @@ public class ProductDAOImpl implements ProductDAO {
     @Override
     public Product getProductById(int productId) throws LowStockException {
         try (Connection con = JdbcUtils.getConnection()) {
-            String query = "SELECT * FROM product WHERE productId = ?";
+            String query = "SELECT * FROM products WHERE productId = ?";
             PreparedStatement ptmt = con.prepareStatement(query);
             ptmt.setInt(1, productId);
             ResultSet rs = ptmt.executeQuery();
@@ -67,7 +67,7 @@ public class ProductDAOImpl implements ProductDAO {
 
         List<Product> updatedProducts = new ArrayList<>();
         try (Connection con = JdbcUtils.getConnection()) {
-            String selectQuery = "SELECT * FROM product WHERE category = ?";
+            String selectQuery = "SELECT * FROM products WHERE category = ?";
             PreparedStatement selectStmt = con.prepareStatement(selectQuery);
             selectStmt.setString(1, category);
             ResultSet rs = selectStmt.executeQuery();
@@ -85,7 +85,7 @@ public class ProductDAOImpl implements ProductDAO {
                 updatedProducts.add(product);
             }
 
-            String updateQuery = "UPDATE product SET price = ?, stock = ? WHERE category = ?";
+            String updateQuery = "UPDATE products SET price = ?, stock = ? WHERE category = ?";
             PreparedStatement updateStmt = con.prepareStatement(updateQuery);
             updateStmt.setDouble(1, newPrice);
             updateStmt.setInt(2, newStockQuantity);
@@ -102,7 +102,7 @@ public class ProductDAOImpl implements ProductDAO {
     public List<Product> deleteProductByPrice(double priceThreshold) throws LowStockException {
         List<Product> deletedProducts = new ArrayList<>();
         try (Connection con = JdbcUtils.getConnection()) {
-            String selectQuery = "SELECT * FROM product WHERE price < ?";
+            String selectQuery = "SELECT * FROM products WHERE price < ?";
             PreparedStatement selectStmt = con.prepareStatement(selectQuery);
             selectStmt.setDouble(1, priceThreshold);
             ResultSet rs = selectStmt.executeQuery();
@@ -118,7 +118,7 @@ public class ProductDAOImpl implements ProductDAO {
                 ));
             }
   
-            String deleteQuery = "DELETE FROM product WHERE price < ?";
+            String deleteQuery = "DELETE FROM products WHERE price < ?";
             PreparedStatement deleteStmt = con.prepareStatement(deleteQuery);
             deleteStmt.setDouble(1, priceThreshold);
             deleteStmt.executeUpdate();
@@ -133,7 +133,7 @@ public class ProductDAOImpl implements ProductDAO {
     public List<Product> viewProductDetailsByCategory(String category) throws LowStockException {
         List<Product> products = new ArrayList<>();
         try (Connection con = JdbcUtils.getConnection()) {
-            String query = "SELECT * FROM product WHERE category = ?";
+            String query = "SELECT * FROM products WHERE category = ?";
             PreparedStatement ptmt = con.prepareStatement(query);
             ptmt.setString(1, category);
             ResultSet rs = ptmt.executeQuery();
