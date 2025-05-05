@@ -3,7 +3,6 @@ package com.examly.springapp.service.impl;
 import java.util.List;
 
 import com.examly.springapp.dao.ProductDAO;
-import com.examly.springapp.exception.LowAttendanceException;
 import com.examly.springapp.model.Product;
 import com.examly.springapp.dao.impl.ProductDAOImpl;
 import com.examly.springapp.service.ProductService;

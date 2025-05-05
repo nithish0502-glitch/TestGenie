@@ -4,46 +4,39 @@ import java.util.List;
 
 import com.examly.springapp.dao.ProductInMemoryDAO;
 import com.examly.springapp.dao.impl.ProductInMemoryDAOImpl;
-import com.examly.springapp.exception.LowAttendanceException;
 import com.examly.springapp.model.Product;
 import com.examly.springapp.service.ProductInMemoryService;
- 
+
 public class ProductInMemoryServiceImpl implements ProductInMemoryService {
 
-    private ProductInMemoryDAO attendanceDAO;
+    private ProductInMemoryDAO productDAO;
 
     public ProductInMemoryServiceImpl() {
-        this.attendanceDAO = new ProductInMemoryDAOImpl(); // using in-memory DAO
-    }
- 
-    @Override
-    public Product markAttendance(Product attendance) {
-        return attendanceDAO.markAttendance(attendance);
+        this.productDAO = new ProductInMemoryDAOImpl(); // using in-memory DAO
     }
 
     @Override
-    public List<Product> getAttendanceByStudentId(int studentId) {
-        return attendanceDAO.getAttendanceByStudentId(studentId);
+    public Product createProduct(Product product) {
+        return productDAO.createProduct(product);
     }
 
     @Override
-    public List<Product> getStudentByAttendanceByRange(int minPercent, int maxPercent) {
-        return attendanceDAO.getStudentByAttendanceByRange(minPercent, maxPercent);
+    public Product getProductById(int productId) {
+        return productDAO.getProductById(productId);
     }
 
     @Override
-    public List<Product> getStudentByAttendanceAndCourse(String course, int attendancePercentage) {
-        return attendanceDAO.getStudentByAttendanceAndCourse(course, attendancePercentage);
+    public List<Product> updateProductByCategory(String category, double newPrice, int newStockQuantity) {
+        return productDAO.updateProductByCategory(category, newPrice, newStockQuantity);
     }
 
     @Override
-    public void deleteStudentByAttendanceAndCourse(String course, int attendancePercentage) {
-        attendanceDAO.deleteStudentByAttendanceAndCourse(course, attendancePercentage);
+    public List<Product> deleteProductByPrice(double priceThreshold) {
+        return productDAO.deleteProductByPrice(priceThreshold);
     }
 
     @Override
-    public void updateAttendanceByNameAndCourse(String name, String course, int newAttendancePercent)
-            throws LowAttendanceException {
-        attendanceDAO.updateAttendanceByNameAndCourse(name, course, newAttendancePercent);
+    public List<Product> viewProductDetailsByCategory(String category) {
+        return productDAO.viewProductDetailsByCategory(category);
     }
 }
