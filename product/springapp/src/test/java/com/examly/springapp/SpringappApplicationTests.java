@@ -127,23 +127,24 @@ public class SpringappApplicationTests {
 
     @Test
     public void Week1_Day1_testLowAttendanceThrowsException() throws Exception {
-        // Load Attendance class
-        Class<?> attendanceClass = Class.forName("com.examly.springapp.model.Attendance");
-
+        // Load Product class (renamed from Attendance to match product-based domain)
+        Class<?> productClass = Class.forName("com.examly.springapp.model.Product");
+    
         // Create constructor with appropriate parameters
-        Constructor<?> constructor = attendanceClass.getConstructor(int.class, String.class, String.class, String.class,
-                double.class);
-
-        // Test case to simulate low attendance percentage (should throw
-        // LowAttendanceException)
+        Constructor<?> constructor = productClass.getConstructor(int.class, String.class, String.class, String.class, double.class);
+    
+        // Load exception class via reflection
+        Class<?> exceptionClass = Class.forName("com.examly.springapp.exception.LowStockException");
+    
+        // Trigger exception through reflection
         Exception exception = assertThrows(Exception.class, () -> {
-            constructor.newInstance(2, "2024-04-01", "Jane Doe", "Math", 35.0); // below 40%
+            constructor.newInstance(2, "2024-04-01", "Jane Doe", "Math", 5.0); // stock below 10
         });
-
-        // Assert that the exception is of type LowAttendanceException
-        assertTrue(exception.getCause() instanceof com.examly.springapp.exception.LowAttendanceException);
-        assertTrue(exception.getCause().getMessage().contains("Attendance below 40% is not acceptable."));
+        
+        assertTrue(exceptionClass.isInstance(exception.getCause()));
+        assertTrue(exception.getCause().getMessage().contains("Stock is low"));
     }
+    
 
     @Test
     @Order(1)
