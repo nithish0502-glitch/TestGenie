@@ -2,18 +2,18 @@ package com.examly.springapp.service.impl;
 
 import java.util.List;
 
-import com.examly.springapp.dao.AttendanceMemoryDAO;
-import com.examly.springapp.dao.impl.AttendanceMemoryDAOImpl;
+import com.examly.springapp.dao.ProductInMemoryDAO;
+import com.examly.springapp.dao.impl.ProductInMemoryDAOImpl;
 import com.examly.springapp.exception.LowAttendanceException;
 import com.examly.springapp.model.Product;
 import com.examly.springapp.service.ProductInMemoryService;
  
 public class ProductInMemoryServiceImpl implements ProductInMemoryService {
 
-    private AttendanceMemoryDAO attendanceDAO;
+    private ProductInMemoryDAO attendanceDAO;
 
     public ProductInMemoryServiceImpl() {
-        this.attendanceDAO = new AttendanceMemoryDAOImpl(); // using in-memory DAO
+        this.attendanceDAO = new ProductInMemoryDAOImpl(); // using in-memory DAO
     }
  
     @Override

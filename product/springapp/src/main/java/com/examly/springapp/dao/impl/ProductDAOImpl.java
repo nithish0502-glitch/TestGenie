@@ -12,7 +12,7 @@ import com.examly.springapp.dao.ProductDAO;
 import com.examly.springapp.exception.LowAttendanceException;
 import com.examly.springapp.model.Product;
 
-public class AttendanceDAOImpl implements ProductDAO {
+public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public void markAttendance(Product attendance) {
