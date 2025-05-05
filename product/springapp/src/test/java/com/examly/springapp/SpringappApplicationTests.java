@@ -53,7 +53,7 @@ public class SpringappApplicationTests {
         constructor = productClass.getConstructor(int.class, String.class, String.class, double.class, int.class,
                 boolean.class);
 
-        Class<?> daoClass = Class.forName("com.examly.springapp.dao.impl.ProductInMemoryDAOImpl");
+        Class<?> daoClass = Class.forName("com.examly.springapp.dao.impl.ProductDAOImpl");
         productDAO = daoClass.getDeclaredConstructor().newInstance();
 
         Class<?> jdbcUtilsClass = Class.forName("com.examly.springapp.config.JdbcUtils");
