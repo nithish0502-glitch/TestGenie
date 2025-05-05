@@ -6,9 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.examly.springapp.exception.LowAttendanceException;
-import com.examly.springapp.model.Attendance;
-import com.examly.springapp.service.AttendanceService;
-import com.examly.springapp.service.impl.AttendanceServiceImpl;
+import com.examly.springapp.model.Product;
+import com.examly.springapp.service.ProductService;
+import com.examly.springapp.service.impl.ProductServiceImpl;
 
 
 @SpringBootApplication
@@ -18,11 +18,11 @@ public class SpringappApplication {
         SpringApplication.run(SpringappApplication.class, args);
         Scanner scanner = new Scanner(System.in);
         int choice = Integer.parseInt(scanner.nextLine());
-        AttendanceService attendanceService = new AttendanceServiceImpl();
+        ProductService attendanceService = new ProductServiceImpl();
         switch(choice){
             case 1: 
                     try{
-                        attendanceService.markAttendance(new Attendance(Integer.parseInt(scanner.nextLine()), scanner.nextLine(), scanner.nextLine(), scanner.nextLine(), Double.parseDouble(scanner.nextLine())));
+                        attendanceService.markAttendance(new Product(Integer.parseInt(scanner.nextLine()), scanner.nextLine(), scanner.nextLine(), scanner.nextLine(), Double.parseDouble(scanner.nextLine())));
 
                     }catch(LowAttendanceException e){
                         System.out.println("Low Attendance");
@@ -58,8 +58,8 @@ public class SpringappApplication {
         System.out.println("5. Delete Attendance by Percentage and Course");
         System.out.println("6. Exit");
         try{
-            Attendance attendance1 = new Attendance(001, "09/10/2001","Ishan", "SDET", 99.99 );
-            Attendance attendance2 = new Attendance(002, "09/10/2003","Student2", "Java Full Stack", 39 );
+            Product attendance1 = new Product(001, "09/10/2001","Ishan", "SDET", 99.99 );
+            Product attendance2 = new Product(002, "09/10/2003","Student2", "Java Full Stack", 39 );
             if(attendance1.getAttendancePercentage() <40 || attendance2.getAttendancePercentage()< 40) throw new LowAttendanceException("Attendance is Low");
         }catch(Exception e){
             System.out.println(e.getMessage());
@@ -68,7 +68,7 @@ public class SpringappApplication {
 
     }
     // Rest of the methods for sorting and displaying data
-    public static void displayAttendanceDetails(Attendance attendance){
+    public static void displayAttendanceDetails(Product attendance){
        System.out.printf("StudentId: %d, date: %s, name: %s, course: %s, attendance Percentage: %.2f", attendance.getStudentId(), attendance.getDate(), attendance.getName(), attendance.getCourse(), attendance.getAttendancePercentage());
     }
 }
