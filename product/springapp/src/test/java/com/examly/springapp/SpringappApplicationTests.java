@@ -238,11 +238,9 @@ public class SpringappApplicationTests {
                 .newInstance(202, "Chair", "Furniture", 2500.0, 12, false);
 
         Method createMethod = productDAO.getClass().getMethod("createProduct", productClass);
-        System.out.println("*".repeat(20));
-        System.out.println(createMethod);
         createMethod.invoke(productDAO, product1);
         createMethod.invoke(productDAO, product2);
-
+        
         int rowCountAfter = getRowCount();
         assertEquals(rowCountBefore + 2, rowCountAfter, "Two product records should be added");
     }
