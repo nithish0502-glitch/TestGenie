@@ -139,7 +139,7 @@ public class SpringappApplicationTests {
         Object p3 = constructor.newInstance(3, "Tablet", "Electronics", 300.0, 20, false);
         Object p4 = constructor.newInstance(4, "Mouse", "Accessories", 25.0, 14, true);
 
-        Method createMethod = serviceInstance.getClass().getMethod("addProduct", productClass);
+        Method createMethod = serviceInstance.getClass().getMethod("createProduct", productClass);
         createMethod.invoke(serviceInstance, p1);
         createMethod.invoke(serviceInstance, p2);
         createMethod.invoke(serviceInstance, p3);
@@ -211,13 +211,12 @@ public class SpringappApplicationTests {
     public void Week1_Day2_testViewByCategorySorted_InMemoryList() throws Exception {
         Method viewMethod = serviceInstance.getClass().getMethod("viewProductDetailsByCategory", String.class);
         List<?> result = (List<?>) viewMethod.invoke(serviceInstance, "Accessories");
-
         assertEquals(1, result.size());
         Method toStringMethod = productClass.getMethod("toString");
         String info = (String) toStringMethod.invoke(result.get(0));
         assertTrue(info.contains("Keyboard"));
     }
-
+ 
     private int getRowCount() throws SQLException {
         try (PreparedStatement pstmt = connection.prepareStatement("SELECT COUNT(*) FROM products");
                 ResultSet rs = pstmt.executeQuery()) {
@@ -227,7 +226,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(1)
-    public void testCreateProduct() throws Exception {
+    public void Week1_Day3_testCreateProduct() throws Exception {
         int rowCountBefore = getRowCount();
 
         Object product1 = productClass.getConstructor(
@@ -239,6 +238,8 @@ public class SpringappApplicationTests {
                 .newInstance(202, "Chair", "Furniture", 2500.0, 12, false);
 
         Method createMethod = productDAO.getClass().getMethod("createProduct", productClass);
+        System.out.println("*".repeat(20));
+        System.out.println(createMethod);
         createMethod.invoke(productDAO, product1);
         createMethod.invoke(productDAO, product2);
 
@@ -248,7 +249,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(2)
-    public void testGetProductById() throws Exception {
+    public void Week1_Day3_testGetProductById() throws Exception {
         Method getByIdMethod = productDAO.getClass().getMethod("getProductById", int.class);
         Object result = getByIdMethod.invoke(productDAO, 201);
 
@@ -259,7 +260,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(3)
-    public void testUpdateProductByCategory() throws Exception {
+    public void Week1_Day3_testUpdateProductByCategory() throws Exception {
         Method updateMethod = productDAO.getClass().getMethod("updateProductByCategory",
                 String.class, double.class, int.class);
         Object result = updateMethod.invoke(productDAO, "Electronics", 60000.0, 20);
@@ -274,7 +275,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(4)
-    public void testDeleteProductByPrice() throws Exception {
+    public void Week1_Day3_testDeleteProductByPrice() throws Exception {
         int rowCountBefore = getRowCount();
 
         Method deleteMethod = productDAO.getClass().getMethod("deleteProductByPrice", double.class);
@@ -287,7 +288,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(5)
-    public void testViewProductDetailsByCategory() throws Exception {
+    public void Week1_Day3_testViewProductDetailsByCategory() throws Exception {
         Method viewMethod = productDAO.getClass().getMethod("viewProductDetailsByCategory", String.class);
         Object result = viewMethod.invoke(productDAO, "Electronics");
 
