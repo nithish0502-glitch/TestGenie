@@ -71,7 +71,7 @@ public class SpringappApplicationTests {
         Class<?> exceptionClass = Class.forName("com.examly.springapp.exception.InvalidBookPriceException");
 
         Exception exception = assertThrows(Exception.class, () -> {
-            constructor.newInstance(2, "Invisible Man", "Ralph Ellison", -100.0, true);
+            constructor.newInstance(2, "Invisible Man", "Ralph Ellison", -100.0f, true);
         });
 
         assertTrue(exceptionClass.isInstance(exception.getCause()));
@@ -117,7 +117,7 @@ public class SpringappApplicationTests {
     @Test
     @Order(5)
     public void testDeleteBooksByAuthorWithLimit() throws Exception {
-        Object b3 = constructor.newInstance(3, "Animal Farm", "George Orwell", 250.0, true);
+        Object b3 = constructor.newInstance(3, "Animal Farm", "George Orwell", 250.0f, true);
         Method addMethod = daoInstance.getClass().getMethod("createBook", bookClass);
         addMethod.invoke(daoInstance, b3);
 
