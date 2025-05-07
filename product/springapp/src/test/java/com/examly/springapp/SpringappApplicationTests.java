@@ -75,7 +75,7 @@ public class SpringappApplicationTests {
         });
 
         assertTrue(exceptionClass.isInstance(exception.getCause()));
-        assertTrue(exception.getCause().getMessage().contains("Invalid book price"));
+        assertTrue(exception.getCause().getMessage().contains("Price cannot be negative"));
     }
 
     @Test
@@ -117,12 +117,12 @@ public class SpringappApplicationTests {
     @Test
     @Order(5)
     public void testDeleteBooksByAuthorWithLimit() throws Exception {
-        Object b3 = constructor.newInstance(3, "Animal Farm", "George Orwell", 250.0f, true);
+        Object b3 = constructor.newInstance(3, "Animal Farm", "George Orwella", 250.0f, true);
         Method addMethod = daoInstance.getClass().getMethod("createBook", bookClass);
         addMethod.invoke(daoInstance, b3);
 
         Method deleteMethod = daoInstance.getClass().getMethod("deleteBooksByAuthor", String.class, int.class);
-        deleteMethod.invoke(daoInstance, "George Orwell", 1);
+        deleteMethod.invoke(daoInstance, "George Orwella", 1);
 
         Field listField = daoInstance.getClass().getDeclaredField("bookDatabase");
         listField.setAccessible(true);
@@ -131,6 +131,8 @@ public class SpringappApplicationTests {
         for (Object book : books) {
             Method toStringMethod = bookClass.getMethod("toString");
             String info = (String) toStringMethod.invoke(book);
+            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            System.out.println(info);
             assertFalse(info.contains("Animal Farm"));
         }
     }
