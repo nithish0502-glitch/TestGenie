@@ -68,7 +68,7 @@ public class SpringappApplicationTests {
     @Test
     @Order(2)
     public void testInvalidBookThrowsException() throws Exception {
-        Class<?> exceptionClass = Class.forName("com.examly.springapp.exception.InvalidBookPriceException");
+        Class<?> exceptionClass = Class.forName("com.examly.springapp.exception.LowPriceException");
 
         Exception exception = assertThrows(Exception.class, () -> {
             constructor.newInstance(2, "Invisible Man", "Ralph Ellison", -100.0f, true);
