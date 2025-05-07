@@ -54,7 +54,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(1)
-    public void testValidBookCreation() throws Exception {
+    public void Week1_Day1_testValidBookCreation() throws Exception {
         Object book = constructor.newInstance(1, "The Alchemist", "Paulo Coelho", 350.0f, true);
         Method toStringMethod = bookClass.getMethod("toString");
         String details = (String) toStringMethod.invoke(book);
@@ -67,7 +67,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(2)
-    public void testInvalidBookThrowsException() throws Exception {
+    public void Week1_Day1_testInvalidBookThrowsException() throws Exception {
         Class<?> exceptionClass = Class.forName("com.examly.springapp.exception.LowPriceException");
 
         Exception exception = assertThrows(Exception.class, () -> {
@@ -80,7 +80,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(3)
-    public void testAddBookToInMemoryList() throws Exception {
+    public void Week1_Day2_testAddBookToInMemoryList() throws Exception {
         Object b1 = constructor.newInstance(1, "Clean Code", "Robert C. Martin", 450.0f, true);
         Object b2 = constructor.newInstance(2, "1984", "George Orwell", 300.0f, false);
 
@@ -97,7 +97,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(4)
-    public void testUpdateBookInMemoryList() throws Exception {
+    public void Week1_Day2_testUpdateBookInMemoryList() throws Exception {
         Object updatedBook = constructor.newInstance(1, "Clean Code 2nd Ed", "Robert C. Martin", 500.0f, false);
 
         Method updateMethod = daoInstance.getClass().getMethod("updateBook", bookClass);
@@ -116,7 +116,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(5)
-    public void testDeleteBooksByAuthorWithLimit() throws Exception {
+    public void Week1_Day2_testDeleteBooksByAuthorWithLimit() throws Exception {
         Object b3 = constructor.newInstance(3, "Animal Farm", "George Orwella", 250.0f, true);
         Method addMethod = daoInstance.getClass().getMethod("createBook", bookClass);
         addMethod.invoke(daoInstance, b3);
@@ -131,8 +131,6 @@ public class SpringappApplicationTests {
         for (Object book : books) {
             Method toStringMethod = bookClass.getMethod("toString");
             String info = (String) toStringMethod.invoke(book);
-            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println(info);
             assertFalse(info.contains("Animal Farm"));
         }
     }
