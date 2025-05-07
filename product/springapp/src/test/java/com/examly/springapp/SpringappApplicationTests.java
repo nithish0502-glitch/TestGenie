@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -43,6 +44,8 @@ public class SpringappApplicationTests {
       private static Object daoInstance;
     private static Class<?> bookClass;
     private static Constructor<?> constructor;
+    private static Connection connection;
+    private static Object bookDao;
 
     @BeforeAll
     public static void setUp() throws Exception {
@@ -50,6 +53,66 @@ public class SpringappApplicationTests {
 
         bookClass = Class.forName("com.examly.springapp.model.Book");
         constructor = bookClass.getConstructor(int.class, String.class, String.class, float.class, boolean.class);
+
+        Class<?> daoClass = Class.forName("com.examly.springapp.dao.impl.BookDAOImpl");
+        bookDao = daoClass.getDeclaredConstructor().newInstance();
+
+        Class<?> jdbcUtilsClass = Class.forName("com.examly.springapp.config.JdbcUtils");
+        connection = (Connection) jdbcUtilsClass.getMethod("getConnection").invoke(null);
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException {
+        clearDatabase();
+        System.out.println("Database cleared after all tests.");
+    }
+
+    private static void clearDatabase() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("DELETE FROM books");
+        }
+    }
+
+    @Test
+    public void Week1_Day1_AllRequiredFoldersExist() {
+        String[] requiredFolders = {
+                "src/main/java/com/examly/springapp/dao",
+                "src/main/java/com/examly/springapp/config",
+                "src/main/java/com/examly/springapp/model",
+                "src/main/java/com/examly/springapp/service",
+                "src/main/java/com/examly/springapp/exception"
+        };
+
+        for (String folderPath : requiredFolders) {
+            File directory = new File(folderPath);
+            assertTrue(directory.exists() && directory.isDirectory(),
+                    "Folder should exist: " + folderPath);
+        }
+    }
+
+    @Test
+    public void Week1_Day1_AllRequiredClassesExist() {
+        String[] requiredClasses = {
+            "com.examly.springapp.model.Book",
+            "com.examly.springapp.service.BookInMemoryService",
+            "com.examly.springapp.service.BookService",
+            "com.examly.springapp.service.impl.BookInMemoryServiceImpl",
+            "com.examly.springapp.service.impl.BookServiceImpl",
+            "com.examly.springapp.dao.impl.BookInMemoryDAOImpl",
+            "com.examly.springapp.dao.impl.BookDAOImpl",
+            "com.examly.springapp.dao.BookInMemoryDAO",
+            "com.examly.springapp.dao.BookDAO",
+            "com.examly.springapp.exception.LowPriceException",
+            "com.examly.springapp.config.JdbcUtils"
+        };
+ 
+        for (String className : requiredClasses) {
+            try {
+                Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                fail("Class should exist: " + className);
+            }
+        }
     }
 
     @Test
@@ -137,7 +200,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(6)
-    public void testGetAllBooksSortedByTitle() throws Exception {
+    public void Week1_Day2_testGetAllBooksSortedByTitle() throws Exception {
         Method getSortedBooks = daoInstance.getClass().getMethod("getAllBooksByTitle");
         List<?> sortedList = (List<?>) getSortedBooks.invoke(daoInstance);
 
@@ -150,7 +213,7 @@ public class SpringappApplicationTests {
 
     @Test
     @Order(7)
-    public void testGetAvailableBooks() throws Exception {
+    public void Week1_Day2_testGetAvailableBooks() throws Exception {
         Method getAvailableMethod = daoInstance.getClass().getMethod("getAvailableBooks");
         List<?> availableBooks = (List<?>) getAvailableMethod.invoke(daoInstance);
 
@@ -158,5 +221,119 @@ public class SpringappApplicationTests {
             Method isAvailable = bookClass.getMethod("isAvailable");
             assertTrue((Boolean) isAvailable.invoke(book));
         }
+    }
+
+    private int getRowCount() throws SQLException {
+        try (PreparedStatement pstmt = connection.prepareStatement("SELECT COUNT(*) FROM books");
+             ResultSet rs = pstmt.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    @Test
+    @Order(1)
+    public void Week1_Day3_testCreateBook() throws Exception {
+        int rowCountBefore = getRowCount();
+
+        Object book1 = bookClass.getConstructor(int.class, String.class, String.class, float.class, boolean.class)
+                .newInstance(301, "Java Basics", "Alice", 450.0f, true);
+        Object book2 = bookClass.getConstructor(int.class, String.class, String.class, float.class, boolean.class)
+                .newInstance(302, "Data Structures", "Bob", 600.0f, false);
+
+        Method createMethod = bookDao.getClass().getMethod("createBook", bookClass);
+        createMethod.invoke(bookDao, book1);
+        createMethod.invoke(bookDao, book2);
+
+        int rowCountAfter = getRowCount();
+        assertEquals(rowCountBefore + 2, rowCountAfter, "Two book records should be added");
+    }
+
+    @Test
+    @Order(2)
+    public void Week1_Day3_testUpdateBook() throws Exception {
+        Object updatedBook = bookClass.getConstructor(int.class, String.class, String.class, float.class, boolean.class)
+                .newInstance(301, "Advanced Java", "Alice", 500.0f, false);
+
+        Method updateMethod = bookDao.getClass().getMethod("updateBook", bookClass);
+        updateMethod.invoke(bookDao, updatedBook);
+
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM books WHERE bookId = ?");
+        stmt.setInt(1, 301);
+        ResultSet rs = stmt.executeQuery();
+
+        assertTrue(rs.next());
+        assertEquals("Advanced Java", rs.getString("title"));
+    }
+
+    @Test
+    @Order(3)
+    public void Week1_Day3_testDeleteBooksByAuthor() throws Exception {
+        int rowCountBefore = getRowCount();
+
+        Method deleteMethod = bookDao.getClass().getMethod("deleteBooksByAuthor", String.class, int.class);
+        deleteMethod.invoke(bookDao, "Bob", 1);
+
+        int rowCountAfter = getRowCount();
+        assertTrue(rowCountAfter < rowCountBefore, "At least one book should be deleted for author Bob");
+    }
+
+    @Test
+    @Order(4)
+    public void Week1_Day3_testGetAllBooksByTitle() throws Exception {
+        Method viewMethod = bookDao.getClass().getMethod("getAllBooksByTitle");
+        Object result = viewMethod.invoke(bookDao);
+
+        assertTrue(result instanceof List<?>);
+        List<?> list = (List<?>) result;
+        assertFalse(list.isEmpty());
+
+        Method getTitle = bookClass.getMethod("getTitle");
+        List<String> titles = new ArrayList<>();
+        for (Object obj : list) {
+            titles.add((String) getTitle.invoke(obj));
+        }
+
+        List<String> sortedTitles = new ArrayList<>(titles);
+        sortedTitles.sort(String.CASE_INSENSITIVE_ORDER);
+        assertEquals(sortedTitles, titles, "Books should be sorted by title");
+    }
+
+    @Test
+    @Order(5)
+    public void Week1_Day3_testGetAvailableBooks() throws Exception {
+        Method availableMethod = bookDao.getClass().getMethod("getAvailableBooks");
+        Object result = availableMethod.invoke(bookDao);
+
+        assertTrue(result instanceof List<?>);
+        List<?> list = (List<?>) result;
+
+        Method isAvailable = bookClass.getMethod("isAvailable");
+        for (Object book : list) {
+            assertTrue((Boolean) isAvailable.invoke(book), "Book should be available");
+        }
+    }
+
+    @Test
+    public void Week1_Day4_testSwitchInMainMethod() {
+        String filePath = "src/main/java/com/examly/springapp/SpringappApplication.java";
+        assertTrue(isSwitchPresentInMain(filePath), "The switch statement should be present in the main method");
+    }
+
+    public static boolean isSwitchPresentInMain(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean inMainMethod = false;
+            while ((line = br.readLine()) != null) {
+                if (line.contains("public static void main")) {
+                    inMainMethod = true;
+                }
+                if (inMainMethod && line.contains("switch")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
