@@ -84,7 +84,7 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
-    public List<Book> getAllBooksByTitle() {
+    public List<Book> getAllBooksByTitle() throws LowPriceException {
         List<Book> books = new ArrayList<>();
         try (Connection con = JdbcUtils.getConnection()) {
             String query = "SELECT * FROM books";
@@ -110,7 +110,7 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
-    public List<Book> getAvailableBooks() {
+    public List<Book> getAvailableBooks() throws LowPriceException {
         List<Book> availableBooks = new ArrayList<>();
         try (Connection con = JdbcUtils.getConnection()) {
             String query = "SELECT * FROM books WHERE available = true";
