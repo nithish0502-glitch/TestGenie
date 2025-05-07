@@ -5,103 +5,92 @@ import java.util.Scanner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import com.examly.springapp.exception.LowStockException;
-import com.examly.springapp.model.Product;
-import com.examly.springapp.service.ProductService;
-import com.examly.springapp.service.impl.ProductServiceImpl;
  
+import com.examly.springapp.exception.LowPriceException;
+import com.examly.springapp.model.Book;
+import com.examly.springapp.service.BookService;
+import com.examly.springapp.service.impl.BookServiceImpl;
+
 @SpringBootApplication
 public class SpringappApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SpringappApplication.class, args);
-        
+
         Scanner scanner = new Scanner(System.in);
-        ProductService productService = new ProductServiceImpl();
-        
+        BookService bookService = new BookServiceImpl();
+
         int choice = 0;
         do {
-            System.out.println("1. Add a new Product");
-            System.out.println("2. Get Product by ID");
-            System.out.println("3. Update Products by Category");
-            System.out.println("4. Delete Products by Price");
-            System.out.println("5. View Products by Category");
+            System.out.println("1. Add a new Book");
+            System.out.println("2. Update a Book");
+            System.out.println("3. Delete Books by Author");
+            System.out.println("4. View All Books Sorted by Title");
+            System.out.println("5. View Available Books");
             System.out.println("6. Exit");
-            
+
             try {
                 choice = Integer.parseInt(scanner.nextLine());
-                
-                switch(choice){
-                    case 1: 
+
+                switch (choice) {
+                    case 1:
                         try {
-                            System.out.println("Enter product details:");
-                            int productId = Integer.parseInt(scanner.nextLine());
-                            String name = scanner.nextLine();
-                            String category = scanner.nextLine();
-                            double price = Double.parseDouble(scanner.nextLine());
-                            int stock = Integer.parseInt(scanner.nextLine());
-                            boolean verified = Boolean.parseBoolean(scanner.nextLine());
-                            
-                            Product product = new Product(productId, name, category, price, stock, verified);
-                            productService.createProduct(product);
-                            System.out.println("Product added successfully!");
-                        } catch (LowStockException e) {
+                            System.out.println("Enter book details:");
+                            int bookId = Integer.parseInt(scanner.nextLine());
+                            String title = scanner.nextLine();
+                            String author = scanner.nextLine();
+                            float price = Float.parseFloat(scanner.nextLine());
+                            boolean available = Boolean.parseBoolean(scanner.nextLine());
+
+                            Book book = new Book(bookId, title, author, price, available);
+                            bookService.createBook(book);
+                            System.out.println("Book added successfully!");
+                        } catch (LowPriceException e) {
                             System.out.println("Error: " + e.getMessage());
                         }
                         break;
                     case 2:
-                        System.out.println("Enter product ID:");
-                        int productId = Integer.parseInt(scanner.nextLine());
                         try {
-                            Product product = productService.getProductById(productId);
-                            if (product != null) {
-                                displayProductDetails(product);
-                            } else {
-                                System.out.println("Product not found!");
-                            }
-                        } catch (LowStockException e) {
+                            System.out.println("Enter updated book details:");
+                            int bookId = Integer.parseInt(scanner.nextLine());
+                            String title = scanner.nextLine();
+                            String author = scanner.nextLine();
+                            float price = Float.parseFloat(scanner.nextLine());
+                            boolean available = Boolean.parseBoolean(scanner.nextLine());
+
+                            Book book = new Book(bookId, title, author, price, available);
+                            bookService.updateBook(book);
+                            System.out.println("Book updated successfully!");
+                        } catch (LowPriceException e) {
                             System.out.println("Error: " + e.getMessage());
                         }
                         break;
                     case 3:
-                        System.out.println("Enter category, new price, and new stock quantity:");
-                        String category = scanner.nextLine();
-                        double newPrice = Double.parseDouble(scanner.nextLine());
-                        int newStockQuantity = Integer.parseInt(scanner.nextLine());
-                        try {
-                            List<Product> updatedProducts = productService.updateProductByCategory(category, newPrice, newStockQuantity);
-                            System.out.println("Updated Products:");
-                            for (Product p : updatedProducts) {
-                                displayProductDetails(p);
-                            }
-                        } catch (LowStockException e) {
-                            System.out.println("Error: " + e.getMessage());
-                        }
+                        System.out.println("Enter author and delete limit:");
+                        String author = scanner.nextLine();
+                        int limit = Integer.parseInt(scanner.nextLine());
+                        bookService.deleteBooksByAuthor(author, limit);
+                        System.out.println("Books deleted successfully!");
                         break;
                     case 4:
-                        System.out.println("Enter price threshold:");
-                        double priceThreshold = Double.parseDouble(scanner.nextLine());
                         try {
-                            List<Product> deletedProducts = productService.deleteProductByPrice(priceThreshold);
-                            System.out.println("Deleted Products:");
-                            for (Product p : deletedProducts) {
-                                displayProductDetails(p);
+                            List<Book> books = bookService.getAllBooksByTitle();
+                            System.out.println("Books sorted by title:");
+                            for (Book b : books) {
+                                displayBookDetails(b);
                             }
-                        } catch (LowStockException e) {
+                        } catch (LowPriceException e) {
                             System.out.println("Error: " + e.getMessage());
                         }
                         break;
                     case 5:
-                        System.out.println("Enter category:");
-                        String categoryForView = scanner.nextLine();
                         try {
-                            List<Product> products = productService.viewProductDetailsByCategory(categoryForView);
-                            System.out.println("Products in category " + categoryForView + ":");
-                            for (Product p : products) {
-                                displayProductDetails(p);
+                            List<Book> availableBooks = bookService.getAvailableBooks();
+                            System.out.println("Available Books:");
+                            for (Book b : availableBooks) {
+                                displayBookDetails(b);
                             }
-                        } catch (LowStockException e) {
+                        } catch (LowPriceException e) {
                             System.out.println("Error: " + e.getMessage());
                         }
                         break;
@@ -118,10 +107,8 @@ public class SpringappApplication {
         } while (choice != 6);
     }
 
-    // Method to display product details
-    public static void displayProductDetails(Product product) {
-        System.out.printf("ProductId: %d, Name: %s, Category: %s, Price: %.2f, Stock: %d, Verified: %b\n",
-                product.getProductId(), product.getName(), product.getCategory(), product.getPrice(), product.getStock(), product.isVerified());
+    public static void displayBookDetails(Book book) {
+        System.out.printf("BookId: %d, Title: %s, Author: %s, Price: %.2f, Available: %b\n",
+                book.getBookId(), book.getTitle(), book.getAuthor(), book.getPrice(), book.isAvailable());
     }
 }
- 
